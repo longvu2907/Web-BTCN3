@@ -1,0 +1,75 @@
+<nav class="navbar bg-light p-2 mt-2 mb-2 rounded-2 p-3">
+  <div class="container-fluid">
+    <a class="navbar-brand mb-0 h1" href="/">Movie Info</a>
+    <nav style="--bs-breadcrumb-divider: '|';" aria-label="breadcrumb">
+      <ol class="breadcrumb d-flex m-0">
+        {{#if isLogin}}
+          <a class="breadcrumb-item nav-link" href="/movie/favorite-movie">Favorite Movie</a>
+          <a class="breadcrumb-item nav-link" href="/logout">Logout</a>
+        {{else}}
+          <a class="breadcrumb-item nav-link" href="/login">Login</a>
+          <a class="breadcrumb-item nav-link" href="/register">Register</a>
+        {{/if}}
+      </ol>
+    </nav>
+  </div>
+  <form
+    class="container-fluid d-flex justify-content-center flex-nowrap gap-4 mt-3"
+    action="/movie/search"
+    method="get"
+  >
+    <span class="search-config p-2 position-relative">
+      <span class="option-icon" style="cursor: pointer;">
+        &#9660
+      </span>
+      <div
+        class="option-form position-absolute p-4 rounded-2 shadow d-none"
+        style="width: 250px; background: #fff; z-index: 99;"
+      >
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="radio"
+            name="searchType"
+            id="movieName"
+            value="movie"
+            checked
+          />
+          <label class="form-check-label" for="movieName">
+            Search movie
+          </label>
+        </div>
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="radio"
+            name="searchType"
+            id="actorName"
+            value="cast"
+          />
+          <label class="form-check-label" for="actorName">
+            Search actor
+          </label>
+        </div>
+      </div>
+    </span>
+    <input
+      type="text"
+      class="form-control"
+      name="searchKey"
+      placeholder="Search"
+      value="{{searchKey}}"
+    />
+    <button class="btn btn-outline-success" type="submit">
+      Search
+    </button>
+  </form>
+</nav>
+
+<script>
+  const optionForm = document.querySelector('.option-form'); const optionIcon =
+  document.querySelector('.option-icon'); optionIcon.addEventListener('click',
+  (e) => { optionForm.classList.toggle('d-none'); if
+  (optionForm.classList.contains('d-none')) { optionIcon.innerHTML = '&#9660' }
+  else { optionIcon.innerHTML = '&#9650' } });
+</script>

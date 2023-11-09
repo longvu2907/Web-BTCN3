@@ -1,0 +1,134 @@
+<div class="d-flex flex-column align-items-center">
+  <h2>{{movieData.title}}</h2>
+  <h5>{{movieData.year}}</h5>
+  <img class="w-50" style="max-width: 400px;" src="{{movieData.image}}" alt="" />
+  <div class="d-flex gap-3 my-2">
+    {{#each movieData.genres}}
+      <span><strong>{{this}}</strong></span>
+    {{/each}}
+  </div>
+  {{#if isLogin}}
+    <button class="btn btn-primary add-favorite" type="submit">Add to Favorite List</button>
+  {{/if}}
+  <div class="d-flex flex-column gap-4 my-4 w-100">
+    <span class="fw-semibold fs-4">Reviews</span>
+    <nav class="d-flex justify-content-center">
+      <ul class="pagination m-0">
+      </ul>
+    </nav>
+    <div class="review-list d-flex flex-column gap-4"></div>
+  </div>
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="resToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-body">
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const toastTrigger = document.querySelector('.add-favorite')
+  const resToast = document.getElementById('resToast')
+  if (toastTrigger) {
+    toastTrigger.addEventListener('click', () => {
+      const toast = new bootstrap.Toast(resToast)
+      const toastContent = document.querySelector('.toast-body')
+
+      fetch('/movie/favorite-movie', {method: 'post', 
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        movie_id: '{{movieData.id}}', 
+        account_id: '{{account_id}}',
+      })})
+      .then(res => {
+        if (res.status === 500) {
+          toastContent.innerText = 'Failed add to favorite list'
+          toast.show()
+        }
+        else {
+          toastContent.innerText = 'Added to favorite list'
+          toast.show()
+        }
+      })
+    })
+  }
+
+  function getReviewData(currentPage) {
+    fetch(`/movie/{{movieData.id}}/getReview?page=${currentPage}`)
+    .then(res => res.json())
+    .then(({data, page, total_page}) => {
+      let listPageHTML = `<li class="page-item page-prev">
+          <span class="page-link">&laquo;</span>
+        </li>`
+      let listReviewHTML = ''
+
+      for (let i = 1; i <= total_page; i++) {
+        listPageHTML += `
+          <li class="page-item ${i === page ? 'active' : ''}">
+            <span class="page-link page-number">${i}</span>
+          </li>
+        `
+      }
+      listPageHTML += `<li class="page-item page-next">
+          <span class="page-link">&raquo;</span>
+        </li>`
+
+      data?.forEach(review => listReviewHTML += `
+        <div class="">
+          <div class="d-flex align-items-center gap-2">
+            <span class="fw-semibold fs-5">${review.author}</span>
+            <span class="fs-6 text-secondary">${(new Date(review.submission_date)).toDateString()}</span>
+          </div>
+          <div class="card review-card mt-3 bg-light">
+            <div class="card-body">
+              <h5 class="card-title">${review.review_title}</h5>
+              <p class="card-text">${review.review_text}</p>
+            </div>
+          </div>
+        </div>
+        `
+      )
+
+      const pageList = document.querySelector('.pagination')
+      pageList.innerHTML = listPageHTML
+      document.querySelector('.review-list').innerHTML = listReviewHTML
+
+      const prevBtn = document.querySelector('.page-prev')
+      const nextBtn = document.querySelector('.page-next')
+
+      prevBtn.classList.remove('disabled') 
+      nextBtn.classList.remove('disabled') 
+
+      if (page === 1) {
+        prevBtn.classList.add('disabled') 
+      }
+      if (page === total_page) {
+        nextBtn.classList.add('disabled') 
+      }
+      
+      prevBtn.addEventListener('click', () => {
+        if (currentPage > 1) {
+          getReviewData(page - 1)
+        }  
+      })
+      nextBtn.addEventListener('click', () => {
+        if (currentPage < total_page) {
+          console.log(page)
+          getReviewData(page + 1)
+        }  
+      })
+      Array.from(pageList.children).forEach(child => {
+        if (child.classList.contains('page-prev') || child.classList.contains('page-next')) {
+          return
+        }
+        child.addEventListener('click', () => {
+          getReviewData(Number.parseInt(child.innerText))
+        })
+      })
+    })
+  }
+
+  getReviewData(1)
+</script>

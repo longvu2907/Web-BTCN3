@@ -1,0 +1,27 @@
+<div class="d-flex flex-column align-items-center w-100">
+  <h2>{{castData.name}}</h2>
+  <h5>{{castData.birth_date}}</h5>
+  <img class="w-50" style="max-width: 250px;" src="{{castData.image}}" alt="" />
+  <div class="d-flex flex-column my-3">
+    <span>Real name: {{castData.real_name}}</span>
+    <span>Gender: {{castData.gender}}</span>
+    <span>Birth place: {{castData.birth_place}}</span>
+  </div>
+  <h2>Related Movie: </h2>
+  <div class="row g-4 w-100">
+    {{#each castData.movieList}}
+      <div class="col-lg-3 col-4">
+          <div
+            class="movie-card w-100 h-100 d-flex flex-column rounded-2 overflow-hidden"
+          >
+            <a href="/movie/{{this.id}}">
+              <img src="{{this.image}}" class="w-100" />
+            </a>
+            <div class="d-flex flex-column text-center p-1 pb-2 movie-card__desc">
+              <span class="fs-5 fw-bold text-truncate w-100">{{this.title}}</span>
+            </div>
+          </div>
+      </div>
+    {{/each}}
+  </div>
+</div>

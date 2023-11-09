@@ -1,0 +1,75 @@
+<div class="d-flex flex-column w-100">
+  <table class="table table-striped">
+    <thead class="table-dark">
+      <tr>
+        <th scope="col" style="width: 25%">#</th>
+        <th scope="col" style="width: 25%">Name</th>
+        <th scope="col" style="width: 25%">Last name</th>
+        <th scope="col" style="width: 25%">Avatar</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each castList}}
+        <tr>
+            <th scope="row">{{this.id}}</th>
+            <td>{{this.name}}</td>
+            <td>{{this.gender}}</td>
+            <td>
+              <a href="/cast/{{this.id}}">
+                <img class='rounded' style='width:128px; height:128px; object-fit:cover;' src='{{this.image}}' />
+              </a>
+            </td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  <nav class="d-flex justify-content-center p-3">
+    <ul class="pagination m-0 d-flex flex-wrap">
+      <li class="page-item page-prev">
+        <span class="page-link">&laquo;</span>
+      </li>
+      {{#times totalPage}}
+        <li class="page-item {{#ifEquals this ../currentPage}}active{{/ifEquals}}">
+          <span class="page-link page-number">{{this}}</span>
+        </li>
+      {{/times}}
+      <li class="page-item page-next">
+        <span class="page-link">&raquo;</span>
+      </li>
+    </ul>
+  </nav>
+</div>
+
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const currentPage = Number.parseInt(urlParams.get('currentPage')) || 1;
+
+  document.querySelectorAll('.page-number').forEach(page => {
+    page.addEventListener('click', e => {
+      urlParams.set('currentPage', page.innerText);
+      window.location.search = urlParams;
+    });
+  });
+
+  document.querySelector('.page-prev .page-link').addEventListener('click', e=> {
+    if (currentPage > 1) {
+      urlParams.set('currentPage', currentPage - 1);
+      window.location.search = urlParams;
+    }
+  });
+
+  document.querySelector(`.page-next .page-link`).addEventListener('click', e=> {
+    if (currentPage < {{totalPage}}) {
+      urlParams.set('currentPage', currentPage + 1);
+      window.location.search = urlParams;
+    }
+  });
+
+  if (currentPage === 1) {
+    document.querySelector('.page-prev').classList.add('disabled');
+  }
+
+  if (currentPage === {{totalPage}}) {
+    document.querySelector('.page-next').classList.add('disabled');
+  }
+</script>
